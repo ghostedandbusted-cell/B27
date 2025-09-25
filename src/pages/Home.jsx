@@ -21,8 +21,33 @@ const Home = () => {
 
   // iOS video autoplay optimization
   useEffect(() => {
-    // Video interaction handling is now managed in Video.jsx component
-    // This ensures better encapsulation and prevents duplicate event listeners
+    const handleUserInteraction = () => {
+      // Find all videos and attempt to play them after user interaction
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        if (video.paused) {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.warn('Video play failed after user interaction:', error);
+            });
+          }
+        }
+      });
+      
+      // Remove event listeners after first interaction
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    // Add event listeners for user interaction on iOS
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction, { passive: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
   }, []);
 
   useGSAP(() => {
