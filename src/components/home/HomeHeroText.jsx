@@ -17,10 +17,14 @@ const HomeHeroText = () => {
               loop
               muted
               preload="auto"
+              poster="/video-poster.jpg"
               webkit-playsinline="true"
               onLoadedData={(e) => {
                 // Force play on iOS after video loads
                 const video = e.target;
+                video.muted = true;
+                video.setAttribute('muted', '');
+                video.setAttribute('playsinline', '');
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
                   playPromise.catch(error => {
@@ -28,8 +32,14 @@ const HomeHeroText = () => {
                   });
                 }
               }}
+              onError={(e) => {
+                console.warn('Inline video failed to load');
+                // Fallback to poster image styling
+                e.target.style.display = 'none';
+              }}
             >
               <source src="/video.mp4" type="video/mp4" />
+              <source src="/video-720.mp4" type="video/mp4" />
             </video>
           </div>
           <span>do the</span>
